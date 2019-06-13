@@ -9,7 +9,7 @@ class CronParser
     attr_accessor :year, :month, :day, :hour, :min, :sec
     attr_accessor :time_source
 
-    def initialize(time,time_source = Time)
+    def initialize(time = Time.now, time_source = Time)
       @year = time.year
       @month = time.month
       @day = time.day
@@ -72,6 +72,8 @@ class CronParser
       '0 0 * * *'
     when '@hourly'
       '0 * * * *'
+    when '@minutely'
+      '* * * * *'
     else
       spec
     end
@@ -282,8 +284,8 @@ class CronParser
     @time_specs ||= begin
       tokens = substitute_parse_symbols(@source).split(/\s+/)
       # tokens now contains the 5 or 7 fields
-      
-      if tokens.count <= 6
+
+      if tokens.count = 5
         {
           :second => parse_element("0", 0..59),       #second
           :minute => parse_element(tokens[0], 0..59), #minute
@@ -291,6 +293,16 @@ class CronParser
           :dom    => parse_element(tokens[2], 1..31), #DOM
           :month  => parse_element(tokens[3], 1..12), #mon
           :dow    => parse_element(tokens[4], 0..6),  #DOW
+          :year   => parse_element("*", 2000..2050)   #year
+        }
+      elsif tokens.count = 6
+        {
+          :second => parse_element(tokens[0], 0..59), #second
+          :minute => parse_element(tokens[1], 0..59), #minute
+          :hour   => parse_element(tokens[2], 0..23), #hour
+          :dom    => parse_element(tokens[3], 1..31), #DOM
+          :month  => parse_element(tokens[4], 1..12), #mon
+          :dow    => parse_element(tokens[5], 0..6),  #DOW
           :year   => parse_element("*", 2000..2050)   #year
         }
       else
@@ -340,7 +352,7 @@ class CronParser
       raise ArgumentError, 'not a valid cronline'
     end
     source_length = @source.split(/\s+/).length
-    unless (source_length >= 5 && source_length <= 6) || (source_length >= 7 && source_length <= 8)
+    unless (source_length > 5 && source_length < 8)
       raise ArgumentError, 'not a valid cronline'
     end
   end
