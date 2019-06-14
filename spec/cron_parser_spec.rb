@@ -88,7 +88,7 @@ describe "CronParser#next" do
     ["* * * * * * 2016-2018", "2014-02-01 15:46:00",  "2016-01-01 00:00:00",1],
     ["* * * * * * */20",      "2014-02-01 15:46:00",  "2020-01-01 00:00:00",1],
     # tw testing
-    # basic 6 digit dkron
+    # 6 digit dkron
     ["0 * * * * *",           "2019-06-01 08:00:00",  "2019-06-01 08:01:00",1],
     ["0 0 * * * *",           "2019-06-01 08:00:00",  "2019-06-01 09:00:00",1],
     ["0 0 0 * * *",           "2019-06-01 08:00:00",  "2019-06-02 00:00:00",1],
@@ -229,8 +229,16 @@ describe "CronParser#new" do
     expect { CronParser.new('30 * * * *') }.not_to raise_error
   end
 
-  it 'should raise error when given an invalid cronline' do
-    expect { CronParser.new('* * * *') }.to raise_error('not a valid cronline')
+
+  [
+    ["* * * *"],
+    ["? ? ? ? ? ?"],
+    ["? * * * * *"],
+    ["* * * * * * * *"],
+  ].each do |line|
+    it 'should raise error when given an invalid cronline' do
+      expect { CronParser.new(line) }.to raise_error('not a valid cronline')
+    end
   end
 end
 

@@ -162,7 +162,10 @@ class CronParser
   SUBELEMENT_REGEX = %r{^(\d+)(-(\d+)(/(\d+))?)?$}
   def parse_element(elem, allowed_range)
     values = elem.split(',').map do |subel|
-      if subel =~ /^(\*|\?)/
+      if subel =~ /^\*/
+        step = subel.length > 1 ? subel[2..-1].to_i : 1
+        stepped_range(allowed_range, step)
+      elsif subel =~ /^\?$/ && (allowed_range == (1..31) || allowed_range == (0..6))
         step = subel.length > 1 ? subel[2..-1].to_i : 1
         stepped_range(allowed_range, step)
       else
