@@ -165,6 +165,9 @@ class CronParser
       if subel =~ /^\*/
         step = subel.length > 1 ? subel[2..-1].to_i : 1
         stepped_range(allowed_range, step)
+      elsif subel =~ /^\?$/ && (allowed_range == (1..31) || allowed_range == (0..6))
+        step = subel.length > 1 ? subel[2..-1].to_i : 1
+        stepped_range(allowed_range, step)
       else
         if SUBELEMENT_REGEX === subel
           if $5 # with range
@@ -285,7 +288,7 @@ class CronParser
       tokens = substitute_parse_symbols(@source).split(/\s+/)
       # tokens now contains the 5 or 7 fields
 
-      if tokens.count = 5
+      if tokens.count == 5
         {
           :second => parse_element("0", 0..59),       #second
           :minute => parse_element(tokens[0], 0..59), #minute
@@ -295,7 +298,7 @@ class CronParser
           :dow    => parse_element(tokens[4], 0..6),  #DOW
           :year   => parse_element("*", 2000..2050)   #year
         }
-      elsif tokens.count = 6
+      elsif tokens.count == 6
         {
           :second => parse_element(tokens[0], 0..59), #second
           :minute => parse_element(tokens[1], 0..59), #minute
@@ -352,7 +355,7 @@ class CronParser
       raise ArgumentError, 'not a valid cronline'
     end
     source_length = @source.split(/\s+/).length
-    unless (source_length > 5 && source_length < 8)
+    unless (source_length >= 5 && source_length < 8)
       raise ArgumentError, 'not a valid cronline'
     end
   end
